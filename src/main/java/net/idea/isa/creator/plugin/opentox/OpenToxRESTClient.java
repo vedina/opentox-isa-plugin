@@ -11,8 +11,7 @@ import java.util.TreeSet;
 
 import net.idea.isa.creator.plugin.opentox.resource.ResourceDescription;
 import net.idea.isa.creator.plugin.opentox.xml.ResourceXMLHandler;
-import net.idea.restnet.cli.OTClient;
-import net.idea.restnet.cli.structure.Substance;
+import net.idea.opentox.cli.OTClient;
 
 import org.isatools.isacreator.configuration.RecommendedOntology;
 import org.isatools.isacreator.gui.ApplicationManager;
