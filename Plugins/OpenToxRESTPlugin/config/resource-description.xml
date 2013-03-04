@@ -5,32 +5,32 @@
 	    
 
    <resource name="OpenTox similarity search" abbreviation="OTSIM" 
-    	queryURL="http://apps.ideaconsult.net:8080/ambit2/query/similarity" version="0.1">
+    	queryURL="http://apps.ideaconsult.net:8080/toxbank/query/similarity" version="0.1">
 
     </resource>
     
    <resource name="OpenTox exact search" abbreviation="OTEXACT" 
-    	queryURL="http://apps.ideaconsult.net:8080/ambit2/query/compound/search/all" version="0.1">
+    	queryURL="http://apps.ideaconsult.net:8080/toxbank/query/compound/search/all" version="0.1">
     </resource>    
     
    <resource name="OpenTox substructure search" abbreviation="OTSUB" 
-    	queryURL="http://apps.ideaconsult.net:8080/ambit2/query/smarts" version="0.1">
+    	queryURL="http://apps.ideaconsult.net:8080/toxbank/query/smarts" version="0.1">
     </resource>    
 	    
     <resource name="OpenTox algorithms" abbreviation="OTALG" 
-    	queryURL="http://apps.ideaconsult.net:8080/ambit2/algorithm" version="0.1">
+    	queryURL="http://apps.ideaconsult.net:8080/toxbank/algorithm" version="0.1">
 
     </resource>
     
 	    
     <resource name="OpenTox models" abbreviation="OTMOD" 
-    	queryURL="http://apps.ideaconsult.net:8080/ambit2/model" version="0.1">
+    	queryURL="http://apps.ideaconsult.net:8080/toxbank/model" version="0.1">
 
     </resource>     
     
 	    
     <resource name="OpenTox datasets" abbreviation="OTDATA" 
-    	queryURL="http://apps.ideaconsult.net:8080/ambit2/dataset" version="0.1">
+    	queryURL="http://apps.ideaconsult.net:8080/toxbank/dataset" version="0.1">
 
     </resource>  
     
