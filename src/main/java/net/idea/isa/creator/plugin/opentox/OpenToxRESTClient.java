@@ -2,9 +2,11 @@ package net.idea.isa.creator.plugin.opentox;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -12,6 +14,7 @@ import java.util.TreeSet;
 import net.idea.isa.creator.plugin.opentox.resource.ResourceDescription;
 import net.idea.isa.creator.plugin.opentox.xml.ResourceXMLHandler;
 import net.idea.opentox.cli.OTClient;
+import net.idea.opentox.cli.structure.Substance;
 
 import org.isatools.isacreator.configuration.RecommendedOntology;
 import org.isatools.isacreator.gui.ApplicationManager;
@@ -235,3 +238,5 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
 		return false;
 	}
 }
+
+
