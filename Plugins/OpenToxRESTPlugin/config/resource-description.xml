@@ -4,18 +4,10 @@
 	    <password>guest</password>
 	    
 
-   <resource name="OpenTox similarity search" abbreviation="OTSIM" 
-    	queryURL="http://toxbanktest2.toxbank.net:8080/ambit2/query/similarity" version="0.1">
+   <resource name="OpenTox structure search" abbreviation="OT" 
+    	queryURL="http://toxbanktest2.toxbank.net:8080/ambit2" version="0.1">
 
     </resource>
-    
-   <resource name="OpenTox exact search" abbreviation="OTEXACT" 
-    	queryURL="http://toxbanktest2.toxbank.net:8080/ambit2/query/compound/search/all" version="0.1">
-    </resource>    
-    
-   <resource name="OpenTox substructure search" abbreviation="OTSUB" 
-    	queryURL="http://toxbanktest2.toxbank.net:8080/ambit2/query/smarts" version="0.1">
-    </resource>    
 	    
     <resource name="OpenTox algorithms" abbreviation="OTALG" 
     	queryURL="http://toxbanktest2.toxbank.net:8080/ambit2/algorithm" version="0.1">

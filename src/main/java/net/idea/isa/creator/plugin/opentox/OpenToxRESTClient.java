@@ -2,11 +2,9 @@ package net.idea.isa.creator.plugin.opentox;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -14,7 +12,6 @@ import java.util.TreeSet;
 import net.idea.isa.creator.plugin.opentox.resource.ResourceDescription;
 import net.idea.isa.creator.plugin.opentox.xml.ResourceXMLHandler;
 import net.idea.opentox.cli.OTClient;
-import net.idea.opentox.cli.structure.Substance;
 
 import org.isatools.isacreator.configuration.RecommendedOntology;
 import org.isatools.isacreator.gui.ApplicationManager;
@@ -54,13 +51,13 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
     }
     
     enum OTRESOURCE {
-    	OTEXACT,
-    	OTSIM,
-    	OTSUB,
+    	OT,
     	OTALG,
     	OTMOD,
     	OTDATA
     }
+    
+    private enum SearchMode {auto,similarity,substructure};
     
     private Map<OntologySourceRefObject, List<OntologyTerm>> performQuery(
     							Map<OntologySourceRefObject, List<OntologyTerm>> results,
@@ -75,27 +72,37 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
 										"",
 										resourceDescription.getResourceName());
         	switch (tbresource) {
-        	case OTSIM: {
-        		List<URL> items = otclient.getSubstanceClient().searchSimilarStructuresURI(new URL(resourceDescription.getQueryURL()),term,0.75);
+        	case OT: {
+        		SearchMode mode = SearchMode.auto;
+        		StringBuilder query = null;
+        		String[] terms = term.split(" ");
+        		for (String t : terms) 
+        			try { mode=SearchMode.valueOf(t);} catch (Exception x) {
+        				if (query==null) query = new StringBuilder(); else query.append(" ");
+        				query.append(t);
+        			}
+        		List<URL> items = null;        			
+        		switch (mode) {
+        		case auto: {
+        			items = otclient.getSubstanceClient().searchExactStructuresURI(new URL(resourceDescription.getQueryURL()),query.toString());
+        			break;
+        		}
+        		case similarity: {
+            		items = otclient.getSubstanceClient().searchSimilarStructuresURI(new URL(resourceDescription.getQueryURL()),query.toString(),0.75);
+            		break;
+        		}
+        		case substructure: {
+            		items = otclient.getSubstanceClient().searchSubstructuresURI(new URL(resourceDescription.getQueryURL()),query.toString());
+            		break;
+        		}
+        		default: {
+        			items = otclient.getSubstanceClient().searchSimilarStructuresURI(new URL(resourceDescription.getQueryURL()),query.toString(),0.75);
+        		}
+        		}
         		if (items!=null && items.size()>0) 
         			convertResourceResult(items,source,results);
-        		
         		break;
         	}
-        	case OTSUB: {
-        		List<URL> items = otclient.getSubstanceClient().searchSubstructuresURI(new URL(resourceDescription.getQueryURL()),term);
-        		if (items!=null && items.size()>0) 
-        			convertResourceResult(items,source,results);
-        		
-        		break;
-        	}
-        	case OTEXACT: {
-        		List<URL> items = otclient.getSubstanceClient().searchExactStructuresURI(new URL(resourceDescription.getQueryURL()),term);
-        		if (items!=null && items.size()>0) 
-        			convertResourceResult(items,source,results);
-        		
-        		break;
-        	}        	
         	}
             return results;
         } catch (RestException x) {
