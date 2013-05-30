@@ -58,7 +58,7 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
     	OTDATA
     }
     
-    private enum SearchMode {auto,similarity,substructure};
+    private enum SearchMode {auto,similar,similarity,smarts,substructure};
     
     private Map<OntologySourceRefObject, List<OntologyTerm>> performQuery(
     							Map<OntologySourceRefObject, List<OntologyTerm>> results,
@@ -89,8 +89,16 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
         			items = otclient.getSubstanceClient().searchExactStructuresURI(root,query.toString());
         			break;
         		}
+        		case similar: {
+            		items = otclient.getSubstanceClient().searchSimilarStructuresURI(new URL(resourceDescription.getQueryURL()),query.toString(),0.75);
+            		break;
+        		}
         		case similarity: {
             		items = otclient.getSubstanceClient().searchSimilarStructuresURI(root,query.toString(),0.75);
+            		break;
+        		}
+        		case smarts: {
+            		items = otclient.getSubstanceClient().searchSubstructuresURI(new URL(resourceDescription.getQueryURL()),query.toString());
             		break;
         		}
         		case substructure: {
