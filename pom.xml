@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.idea</groupId>
@@ -99,6 +99,7 @@
                         		!com.ibm.uvm.tools.*,
                         		!com.hp.hpl.jena.sparql.lang.sparql.*, <!-- Who is using ancient arq-2* ??? -->
                         		!org.apache.log.*, <!-- What's this ???  -->
+                        		org.joda.time.*,
                         		*</Import-Package>
             <Export-Package>net.idea.isa.creator.plugin.opentox.</Export-Package>
             <Bundle-Activator>net.idea.isa.creator.plugin.opentox.Activator</Bundle-Activator>
@@ -183,7 +184,7 @@
     <dependency>
       <groupId>ambit</groupId>
       <artifactId>opentox-client</artifactId>
-      <version>1.0.2-SNAPSHOT</version>
+      <version>1.0.3-SNAPSHOT</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>

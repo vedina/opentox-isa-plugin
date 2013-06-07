@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import net.idea.isa.creator.plugin.opentox.resource.ResourceDescription;
 import net.idea.isa.creator.plugin.opentox.xml.ResourceXMLHandler;
 import net.idea.opentox.cli.OTClient;
+import net.idea.opentox.cli.structure.Substance;
 
 import org.isatools.isacreator.configuration.RecommendedOntology;
 import org.isatools.isacreator.gui.ApplicationManager;
@@ -81,26 +82,32 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
         				if (query==null) query = new StringBuilder(); else query.append(" ");
         				query.append(t);
         			}
+        		URL root = new URL(resourceDescription.getQueryURL());
         		List<URL> items = null;        			
         		switch (mode) {
         		case auto: {
-        			items = otclient.getSubstanceClient().searchExactStructuresURI(new URL(resourceDescription.getQueryURL()),query.toString());
+        			items = otclient.getSubstanceClient().searchExactStructuresURI(root,query.toString());
         			break;
         		}
         		case similarity: {
-            		items = otclient.getSubstanceClient().searchSimilarStructuresURI(new URL(resourceDescription.getQueryURL()),query.toString(),0.75);
+            		items = otclient.getSubstanceClient().searchSimilarStructuresURI(root,query.toString(),0.75);
             		break;
         		}
         		case substructure: {
-            		items = otclient.getSubstanceClient().searchSubstructuresURI(new URL(resourceDescription.getQueryURL()),query.toString());
+            		items = otclient.getSubstanceClient().searchSubstructuresURI(root,query.toString());
             		break;
         		}
         		default: {
-        			items = otclient.getSubstanceClient().searchSimilarStructuresURI(new URL(resourceDescription.getQueryURL()),query.toString(),0.75);
+        			items = otclient.getSubstanceClient().searchSimilarStructuresURI(root,query.toString(),0.75);
         		}
         		}
-        		if (items!=null && items.size()>0) 
-        			convertResourceResult(items,source,results);
+        		if (items!=null && items.size()>0) {
+        			List<Substance> substances = new ArrayList<Substance>();
+        			for (URL item: items) {
+        				substances.addAll(otclient.getSubstanceClient().getIdentifiers(root, item));
+        			}
+        			convertResourceResult(substances,source,results);
+        		}
         		break;
         	}
         	}
@@ -213,20 +220,28 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
     }
 
   
-    protected void convertResourceResult(List<? extends URL> resources,OntologySourceRefObject source,Map<OntologySourceRefObject, List<OntologyTerm>> results) {
+    protected void convertResourceResult(List<? extends Substance> resources,OntologySourceRefObject source,Map<OntologySourceRefObject, List<OntologyTerm>> results) {
     	if (resources==null) return;
     	ArrayList<OntologyTerm> terms = new ArrayList<OntologyTerm>();
-    	 for(URL resource:resources) {
-             OntologyTerm ontologyTerm = new OntologyTerm(resource.toExternalForm(),null, source);
+    	 for(Substance resource:resources) {
+    		 String uri = resource.getResourceIdentifier().toExternalForm();
+             OntologyTerm ontologyTerm = new OntologyTerm(uri,null, source);
              ontologyTerm.setOntologyPurl(source.getSourceFile()+"/");
-             ontologyTerm.setOntologySourceAccession(resource.toExternalForm());
-            // ontologyTerm.addToComments("Organisation", user.getOrganisations().toString());
-             ontologyTerm.setOntologyTermName(String.format("%s:%s",source.getSourceName(),ontologyTerm.getOntologySourceAccession()));
+             ontologyTerm.setOntologySourceAccession(uri);
+             ontologyTerm.setOntologyTermName(String.format("%s:%s",
+            		 	source.getSourceName(),ontologyTerm.getOntologySourceAccession()));
             	 //do smth specific
              terms.add(ontologyTerm);
-             ontologyTerm.addToComments("WWW", String.format("<html><a href='%s'>%s</a></html>",resource.toExternalForm(),resource.toExternalForm()));
-             ontologyTerm.addToComments("URI", resource.toExternalForm());
-             ontologyTerm.addToComments("Image", String.format("<html><img src='%s?media=image/png' alt='%s' title='%s'></html>",resource.toExternalForm(),resource.toExternalForm(),resource.toExternalForm()));
+             ontologyTerm.addToComments("WWW", String.format("<html><a href='%s'>%s</a></html>",uri,uri));
+             if (resource.getName()!= null)
+            	 ontologyTerm.addToComments("Name", resource.getName());
+             if (resource.getCas()!=null)
+            	 ontologyTerm.addToComments("CAS RN", resource.getCas());
+             if (resource.getInChIKey()!=null)
+            	 ontologyTerm.addToComments("InChI Key", resource.getInChIKey());
+             ontologyTerm.addToComments("Chemical structure", String.format("<html><img src='%s?media=image/png' alt='%s' title='%s'></html>",
+            		 uri,uri,uri));
+             System.out.println(resource.getName());
          }
     	 if (terms!=null && (terms.size()>0)) results.put(source, terms);
     }
