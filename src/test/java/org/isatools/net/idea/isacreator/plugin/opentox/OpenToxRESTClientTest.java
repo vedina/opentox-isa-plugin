@@ -28,7 +28,7 @@ public class OpenToxRESTClientTest {
                 		term.getComments(),
                 		term.getOntologyPurl(),
                 		term.getOntologySource(),
-                		term.getOntologySourceAccession(),
+                		term.getOntologyTermAccession(),
                 		term.getOntologyVersionId(),
                 		term.getOntologySourceInformation()
                 		));

@@ -140,12 +140,14 @@
       <version>1.4.0</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.isatools</groupId>
-      <artifactId>ISAcreator</artifactId>
-      <version>1.6.0</version>
-      <scope>provided</scope>
-    </dependency>
+
+        <dependency>
+            <groupId>org.isatools</groupId>
+            <artifactId>ISAcreator</artifactId>
+            <version>1.7.1</version>
+            <scope>provided</scope>
+        </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

@@ -15,7 +15,7 @@ import net.idea.opentox.cli.OTClient;
 import net.idea.opentox.cli.structure.Substance;
 
 import org.isatools.isacreator.configuration.RecommendedOntology;
-import org.isatools.isacreator.gui.ApplicationManager;
+import org.isatools.isacreator.managers.ApplicationManager;
 import org.isatools.isacreator.ontologymanager.OntologySourceRefObject;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
 import org.isatools.isacreator.plugins.host.service.PluginOntologyCVSearch;
@@ -225,11 +225,11 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
     	ArrayList<OntologyTerm> terms = new ArrayList<OntologyTerm>();
     	 for(Substance resource:resources) {
     		 String uri = resource.getResourceIdentifier().toExternalForm();
-             OntologyTerm ontologyTerm = new OntologyTerm(uri,null, source);
+             OntologyTerm ontologyTerm = new OntologyTerm(uri,null, "",source);
              ontologyTerm.setOntologyPurl(source.getSourceFile()+"/");
-             ontologyTerm.setOntologySourceAccession(uri);
+             ontologyTerm.setOntologyTermAccession(uri);
              ontologyTerm.setOntologyTermName(String.format("%s:%s",
-            		 	source.getSourceName(),ontologyTerm.getOntologySourceAccession()));
+            		 	source.getSourceName(),ontologyTerm.getOntologyTermAccession()));
             	 //do smth specific
              terms.add(ontologyTerm);
              ontologyTerm.addToComments("WWW", String.format("<html><a href='%s'>%s</a></html>",uri,uri));
