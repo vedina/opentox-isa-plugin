@@ -1,4 +1,4 @@
 opentox-isa-plugin
 ==================
 
-ISACreator plugin providing access to OpenTox REST services
+ISACreator 1.7.x plugin providing access to OpenTox REST services
