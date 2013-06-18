@@ -58,7 +58,7 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
     	OTDATA
     }
     
-    private enum SearchMode {auto,similar,similarity,smarts,substructure};
+    private enum SearchMode {auto,similar,similarity,smarts,substructure,inchikey};
     
     private Map<OntologySourceRefObject, List<OntologyTerm>> performQuery(
     							Map<OntologySourceRefObject, List<OntologyTerm>> results,
@@ -103,6 +103,10 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
         		}
         		case substructure: {
             		items = otclient.getSubstanceClient().searchSubstructuresURI(root,query.toString());
+            		break;
+        		}
+        		case inchikey: {
+            		items = otclient.getSubstanceClient().searchSucturesByInchikeyURI(root,query.toString());
             		break;
         		}
         		default: {
@@ -233,11 +237,11 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
     	ArrayList<OntologyTerm> terms = new ArrayList<OntologyTerm>();
     	 for(Substance resource:resources) {
     		 String uri = resource.getResourceIdentifier().toExternalForm();
-             OntologyTerm ontologyTerm = new OntologyTerm(uri,null, "",source);
+             OntologyTerm ontologyTerm = new OntologyTerm("Compound",null,"", source);
              ontologyTerm.setOntologyPurl(source.getSourceFile()+"/");
              ontologyTerm.setOntologyTermAccession(uri);
-             ontologyTerm.setOntologyTermName(String.format("%s:%s",
-            		 	source.getSourceName(),ontologyTerm.getOntologyTermAccession()));
+            // ontologyTerm.addToComments("Organisation", user.getOrganisations().toString());
+             ontologyTerm.setOntologyTermName(ontologyTerm.getOntologyTermAccession());
             	 //do smth specific
              terms.add(ontologyTerm);
              ontologyTerm.addToComments("WWW", String.format("<html><a href='%s'>%s</a></html>",uri,uri));
@@ -245,11 +249,14 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
             	 ontologyTerm.addToComments("Name", resource.getName());
              if (resource.getCas()!=null)
             	 ontologyTerm.addToComments("CAS RN", resource.getCas());
+             if (resource.getEinecs()!=null)
+            	 ontologyTerm.addToComments("EC No.", resource.getEinecs());             
              if (resource.getInChIKey()!=null)
             	 ontologyTerm.addToComments("InChI Key", resource.getInChIKey());
+             if (resource.getInChI()!=null)
+            	 ontologyTerm.addToComments("InChI", resource.getInChI());             
              ontologyTerm.addToComments("Chemical structure", String.format("<html><img src='%s?media=image/png' alt='%s' title='%s'></html>",
             		 uri,uri,uri));
-             System.out.println(resource.getName());
          }
     	 if (terms!=null && (terms.size()>0)) results.put(source, terms);
     }
