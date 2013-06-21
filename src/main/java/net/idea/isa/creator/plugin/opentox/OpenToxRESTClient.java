@@ -116,7 +116,7 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
         		if (items!=null && items.size()>0) {
         			List<Substance> substances = new ArrayList<Substance>();
         			for (URL item: items) {
-        				substances.addAll(otclient.getSubstanceClient().getIdentifiers(root, item));
+        				substances.addAll(otclient.getSubstanceClient().getIdentifiersAndLinks(root, item));
         			}
         			convertResourceResult(substances,source,results);
         		}
@@ -237,16 +237,31 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
     	ArrayList<OntologyTerm> terms = new ArrayList<OntologyTerm>();
     	 for(Substance resource:resources) {
     		 String uri = resource.getResourceIdentifier().toExternalForm();
-             OntologyTerm ontologyTerm = new OntologyTerm("Compound",null,"", source);
-             ontologyTerm.setOntologyPurl(source.getSourceFile()+"/");
-             ontologyTerm.setOntologyTermAccession(uri);
-            // ontologyTerm.addToComments("Organisation", user.getOrganisations().toString());
-             ontologyTerm.setOntologyTermName(ontologyTerm.getOntologyTermAccession());
+    		 OntologyTerm ontologyTerm;
+             String chebi = resource.getProperties().get(Substance.opentox_ChEBI);
+             if (chebi!=null) {
+            	 ontologyTerm = new OntologyTerm("Compound",null,"", 
+            			 	new OntologySourceRefObject("CHEBI", "http://bioportal.bioontology.org/ontologies/50346/", "104", "A structured classification of chemical compounds of biological relevance."));
+            	 ontologyTerm.addToComments("ChEBI ID", chebi);
+            	 String[] split = chebi.split(":");
+            	 if (split.length==2 && "CHEBI".equals(split[0])) { //use chebi
+            		 ontologyTerm.setOntologyPurl("http://bioportal.bioontology.org/ontologies/50346/");
+            		 ontologyTerm.setOntologyTermAccession(split[0]);
+                     ontologyTerm.setOntologyTermName(split[1]);
+            	 }
+             } else {	 
+	             ontologyTerm = new OntologyTerm("Compound",null,"", source);
+	             ontologyTerm.setOntologyPurl(source.getSourceFile()+"/");
+	             ontologyTerm.setOntologyTermAccession(uri);
+	             ontologyTerm.setOntologyTermName(ontologyTerm.getOntologyTermAccession());
+             }
             	 //do smth specific
              terms.add(ontologyTerm);
-             ontologyTerm.addToComments("WWW", String.format("<html><a href='%s'>%s</a></html>",uri,uri));
-             if (resource.getName()!= null)
-            	 ontologyTerm.addToComments("Name", resource.getName());
+             //ontologyTerm.addToComments("WWW", String.format("<html><a href='%s'>%s</a></html>",uri,uri));
+             if (resource.getName()!= null) {
+            	 String[] names = resource.getName().replace("|",";").split(";");
+            	 ontologyTerm.addToComments("Chemical name", names[0]);
+             }	 
              if (resource.getCas()!=null)
             	 ontologyTerm.addToComments("CAS RN", resource.getCas());
              if (resource.getEinecs()!=null)
@@ -254,9 +269,17 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
              if (resource.getInChIKey()!=null)
             	 ontologyTerm.addToComments("InChI Key", resource.getInChIKey());
              if (resource.getInChI()!=null)
-            	 ontologyTerm.addToComments("InChI", resource.getInChI());             
-             ontologyTerm.addToComments("Chemical structure", String.format("<html><img src='%s?media=image/png' alt='%s' title='%s'></html>",
-            		 uri,uri,uri));
+            	 ontologyTerm.addToComments("InChI", resource.getInChI());
+             
+             String wiki = resource.getProperties().get(Substance.opentox_ToxbankWiki);
+             if (wiki!=null)
+            	 ontologyTerm.addToComments("Gold Compounds Wiki",String.format("<html><a href='%s'>%s</a></html>",wiki,wiki));
+             
+             if (resource.getProperties().get(Substance.opentox_CMS)!=null)
+            	 ontologyTerm.addToComments("COSMOS ID", resource.getProperties().get(Substance.opentox_CMS));
+             
+             ontologyTerm.addToComments("Chemical structure", String.format("<html><img src='%s?media=image/png' alt='%s' title='%s'><br/><a href='%s'>Gold Compounds wiki</a></html>",
+            		 uri,uri,uri,wiki));
          }
     	 if (terms!=null && (terms.size()>0)) results.put(source, terms);
     }
