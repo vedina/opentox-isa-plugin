@@ -3,6 +3,7 @@ package net.idea.isa.creator.plugin.opentox;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
 import org.isatools.isacreator.plugins.host.service.PluginOntologyCVSearch;
 import org.isatools.isacreator.plugins.registries.OntologySearchPluginRegistry;
 import org.opentox.rest.RestException;
+
 
 /**
  * Created by the Ideaconsult Ltd.
@@ -239,6 +241,12 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
     		 String uri = resource.getResourceIdentifier().toExternalForm();
     		 OntologyTerm ontologyTerm;
              String chebi = resource.getProperties().get(Substance.opentox_ChEBI);
+             String[] names = null;
+             if (resource.getName()!= null) {
+            	 names = resource.getName().toUpperCase().replace("|",";").split(";");
+            	 Arrays.sort(names);
+             }	 
+             
              chebi = null;
              if (chebi!=null) {
             	 ontologyTerm = new OntologyTerm("Compound",null,"", 
@@ -247,17 +255,19 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
             	 String[] split = chebi.split(":");
             	 if (split.length==2 && "CHEBI".equals(split[0])) { //use chebi
             		 ontologyTerm.setOntologyPurl("http://bioportal.bioontology.org/ontologies/50346/");
+            		 ontologyTerm.setOntologyTermName(split[1]);
             		 ontologyTerm.setOntologyTermAccession(split[0]);
-                     ontologyTerm.setOntologyTermName(split[1]);
             	 }
              } else {	 
 	             ontologyTerm = new OntologyTerm("Compound",null,"", source);
 	             ontologyTerm.setOntologyPurl(String.format("%s/compound/", source.getSourceFile()));
-	             ontologyTerm.setOntologyTermName(resource.getName());
+	             if (names!=null & names.length>0)
+	            	 ontologyTerm.setOntologyTermName(names[0]);
+	             
 	             if (resource.getInChIKey()==null)
 	            	 ontologyTerm.setOntologyTermAccession(uri);
 	             else
-	            	 ontologyTerm.setOntologyTermAccession(resource.getInChIKey());
+	            	 ontologyTerm.setOntologyTermAccession("OT:"+resource.getInChIKey());
 	           
 	             //ontologyTerm.getOntologyTermAccession());
 	            		 //resource.getName()==null?ontologyTerm.getOntologyTermAccession():resource.getName());
@@ -265,11 +275,9 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
             	 //do smth specific
              terms.add(ontologyTerm);
              //ontologyTerm.addToComments("WWW", String.format("<html><a href='%s'>%s</a></html>",uri,uri));
-             if (resource.getName()!= null) {
-            	 String[] names = resource.getName().replace("|",";").split(";");
-            	 ontologyTerm.addToComments("Chemical name", names[0]);
-             }	 
-             if (resource.getCas()!=null)
+             if (names!=null & names.length>0) ontologyTerm.addToComments("Chemical name", names[0]);
+             for (int i=1; i < names.length; i++)
+				ontologyTerm.addToComments(String.format("Synonym %d",i), names[i]);             if (resource.getCas()!=null)
             	 ontologyTerm.addToComments("CAS RN", resource.getCas());
              if (resource.getEinecs()!=null)
             	 ontologyTerm.addToComments("EC No.", resource.getEinecs());             
