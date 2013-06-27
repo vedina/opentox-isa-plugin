@@ -14,7 +14,7 @@ public class OpenToxRESTClientTest {
     @Test
     public void testSimilaritySearch() {
         OpenToxRESTClient client = new OpenToxRESTClient();
-        Map<OntologySourceRefObject, List<OntologyTerm>> result = client.searchRepository("c1ccccc1 similarity",null,true);
+        Map<OntologySourceRefObject, List<OntologyTerm>> result = client.searchRepository("vinclozolin",null,true);
 
         System.out.println("There are " + result.size() + " results");
         for (OntologySourceRefObject source : result.keySet()) {

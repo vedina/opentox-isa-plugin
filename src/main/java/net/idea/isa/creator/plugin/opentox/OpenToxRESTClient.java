@@ -242,42 +242,47 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
     		 OntologyTerm ontologyTerm;
              String chebi = resource.getProperties().get(Substance.opentox_ChEBI);
              String[] names = null;
+             String[] iupacnames = null;
              if (resource.getName()!= null) {
             	 names = resource.getName().toUpperCase().replace("|",";").split(";");
             	 Arrays.sort(names);
              }	 
+             if (resource.getIupacName()!= null) {
+            	 iupacnames = resource.getIupacName().toUpperCase().replace("|",";").split(";");
+            	 Arrays.sort(iupacnames);
+             }	 
              
-             chebi = null;
+            // chebi = null;
              if (chebi!=null) {
             	 ontologyTerm = new OntologyTerm("Compound",null,"", 
             			 	new OntologySourceRefObject("CHEBI", "http://bioportal.bioontology.org/ontologies/50346/", "104", "A structured classification of chemical compounds of biological relevance."));
             	 ontologyTerm.addToComments("ChEBI ID", chebi);
             	 String[] split = chebi.split(":");
+            	 ontologyTerm.setOntologyTermName(getOntologyTermName(names, iupacnames));
             	 if (split.length==2 && "CHEBI".equals(split[0])) { //use chebi
-            		 ontologyTerm.setOntologyPurl("http://bioportal.bioontology.org/ontologies/50346/");
-            		 ontologyTerm.setOntologyTermName(split[1]);
-            		 ontologyTerm.setOntologyTermAccession(split[0]);
+            		 ontologyTerm.setOntologyPurl("http://purl.bioontology.org/ontology/CHEBI/");
+            		 ontologyTerm.setOntologyTermAccession(chebi);
             	 }
              } else {	 
 	             ontologyTerm = new OntologyTerm("Compound",null,"", source);
 	             ontologyTerm.setOntologyPurl(String.format("%s/compound/", source.getSourceFile()));
-	             if (names!=null & names.length>0)
-	            	 ontologyTerm.setOntologyTermName(names[0]);
-	             
+	             ontologyTerm.setOntologyTermName(getOntologyTermName(names, iupacnames));
 	             if (resource.getInChIKey()==null)
 	            	 ontologyTerm.setOntologyTermAccession(uri);
 	             else
 	            	 ontologyTerm.setOntologyTermAccession("OT:"+resource.getInChIKey());
-	           
-	             //ontologyTerm.getOntologyTermAccession());
-	            		 //resource.getName()==null?ontologyTerm.getOntologyTermAccession():resource.getName());
              }
-            	 //do smth specific
+             
              terms.add(ontologyTerm);
              //ontologyTerm.addToComments("WWW", String.format("<html><a href='%s'>%s</a></html>",uri,uri));
-             if (names!=null & names.length>0) ontologyTerm.addToComments("Chemical name", names[0]);
+             
+             if (iupacnames!=null && iupacnames.length>0) ontologyTerm.addToComments("IUPAC name", iupacnames[0]);
+             
+             if (names!=null && names.length>0) ontologyTerm.addToComments("Chemical name", names[0]);
              for (int i=1; i < names.length; i++)
-				ontologyTerm.addToComments(String.format("Synonym %d",i), names[i]);             if (resource.getCas()!=null)
+				ontologyTerm.addToComments(String.format("Synonym %d",i), names[i]);             
+             
+             if (resource.getCas()!=null)
             	 ontologyTerm.addToComments("CAS RN", resource.getCas());
              if (resource.getEinecs()!=null)
             	 ontologyTerm.addToComments("EC No.", resource.getEinecs());             
@@ -297,13 +302,23 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
              if (resource.getProperties().get(Substance.opentox_CMS)!=null)
             	 ontologyTerm.addToComments("COSMOS ID", resource.getProperties().get(Substance.opentox_CMS));
              
-             ontologyTerm.addToComments("Chemical structure", 
-            		 String.format("<html><img src='%s?media=image/png' alt='%s' title='%s'><br/><a href='%s'>Gold Compounds wiki</a></html>",
-            		 uri,uri,uri,wiki));
+             //if (chebi==null) 
+            	 ontologyTerm.addToComments("Chemical structure", String.format("<img src='%s?media=image/png' alt='%s' title='%s'>",uri,uri,uri));
+             if (wiki != null)
+            	 ontologyTerm.addToComments("Gold Compounds wiki",String.format("<a href='%s'>%s</a>", wiki,wiki));             
          }
     	 if (terms!=null && (terms.size()>0)) results.put(source, terms);
     }
 
+    private String getOntologyTermName(String[] names,String[] iupacnames) {
+    	int len = Integer.MAX_VALUE;
+    	String thename = null;
+        if (names!=null)
+        	for (String name: names) if (name.length()<len) { thename=name; len = name.length();} 
+        if (iupacnames!=null)
+        	for (String name: iupacnames) if (name.length()<len){thename=name; len = name.length();}
+        return "".equals(thename)?null:thename;
+    }
 	public Set<String> getAvailableResourceAbbreviations() {
 		 Set<String> abbreviations = new TreeSet<String>();
 		 for (ResourceDescription resourceDescription : resourceInformation)
