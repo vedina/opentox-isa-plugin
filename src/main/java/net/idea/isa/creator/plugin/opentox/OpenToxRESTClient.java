@@ -239,6 +239,7 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
     		 String uri = resource.getResourceIdentifier().toExternalForm();
     		 OntologyTerm ontologyTerm;
              String chebi = resource.getProperties().get(Substance.opentox_ChEBI);
+             chebi = null;
              if (chebi!=null) {
             	 ontologyTerm = new OntologyTerm("Compound",null,"", 
             			 	new OntologySourceRefObject("CHEBI", "http://bioportal.bioontology.org/ontologies/50346/", "104", "A structured classification of chemical compounds of biological relevance."));
@@ -251,9 +252,15 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
             	 }
              } else {	 
 	             ontologyTerm = new OntologyTerm("Compound",null,"", source);
-	             ontologyTerm.setOntologyPurl(source.getSourceFile()+"/");
-	             ontologyTerm.setOntologyTermAccession(uri);
-	             ontologyTerm.setOntologyTermName(ontologyTerm.getOntologyTermAccession());
+	             ontologyTerm.setOntologyPurl(String.format("%s/compound/", source.getSourceFile()));
+	             ontologyTerm.setOntologyTermName(resource.getName());
+	             if (resource.getInChIKey()==null)
+	            	 ontologyTerm.setOntologyTermAccession(uri);
+	             else
+	            	 ontologyTerm.setOntologyTermAccession(resource.getInChIKey());
+	           
+	             //ontologyTerm.getOntologyTermAccession());
+	            		 //resource.getName()==null?ontologyTerm.getOntologyTermAccession():resource.getName());
              }
             	 //do smth specific
              terms.add(ontologyTerm);
@@ -270,6 +277,10 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
             	 ontologyTerm.addToComments("InChI Key", resource.getInChIKey());
              if (resource.getInChI()!=null)
             	 ontologyTerm.addToComments("InChI", resource.getInChI());
+             if (resource.getSMILES()!=null)
+            	 ontologyTerm.addToComments("SMILES", resource.getSMILES());
+             if (resource.getFormula()!=null)
+            	 ontologyTerm.addToComments("Formula", resource.getFormula());
              
              String wiki = resource.getProperties().get(Substance.opentox_ToxbankWiki);
              if (wiki!=null)
@@ -278,7 +289,8 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
              if (resource.getProperties().get(Substance.opentox_CMS)!=null)
             	 ontologyTerm.addToComments("COSMOS ID", resource.getProperties().get(Substance.opentox_CMS));
              
-             ontologyTerm.addToComments("Chemical structure", String.format("<html><img src='%s?media=image/png' alt='%s' title='%s'><br/><a href='%s'>Gold Compounds wiki</a></html>",
+             ontologyTerm.addToComments("Chemical structure", 
+            		 String.format("<html><img src='%s?media=image/png' alt='%s' title='%s'><br/><a href='%s'>Gold Compounds wiki</a></html>",
             		 uri,uri,uri,wiki));
          }
     	 if (terms!=null && (terms.size()>0)) results.put(source, terms);
