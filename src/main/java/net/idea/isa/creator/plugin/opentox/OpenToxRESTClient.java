@@ -71,7 +71,7 @@ public class OpenToxRESTClient implements PluginOntologyCVSearch {
         	OTRESOURCE tbresource = OTRESOURCE.valueOf(resourceDescription.getResourceAbbreviation());
 			OntologySourceRefObject source = new OntologySourceRefObject(
 										resourceDescription.getResourceAbbreviation(),  
-										resourceDescription.getQueryURL(),
+										resourceDescription.getQueryURL()+"/compound/",
 										"",
 										resourceDescription.getResourceName());
         	switch (tbresource) {
