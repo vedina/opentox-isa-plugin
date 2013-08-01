@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.idea</groupId>
   <artifactId>opentox-isa-plugin</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <name>Plugin to search OpenTox REST services within ISAcreator.</name>
   <packaging>bundle</packaging>
     <ciManagement>
@@ -204,7 +204,7 @@
     <dependency>
       <groupId>ambit</groupId>
       <artifactId>opentox-client</artifactId>
-      <version>1.0.3-SNAPSHOT</version>
+      <version>1.0.3</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
